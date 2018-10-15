@@ -1,9 +1,20 @@
 #include <iostream>
 #include <cstdlib>
 using namespace std;
+
+
+
+
+//CHANGE YOUR STATE SPACE. D CAN ONLY HAPPEN IF PLAYERCARDLEN=2 AND NOT OTHERWISE SO WE CAN CONVERT ONE STATE TO TWO DIFF STATE
+//LIKE LEN==2 AND LEN>=2.
+
+
+
+
+
 const int p;
 int freward[34][12]; //33x10 array which stores the final rewards
-int faction[34][12]; //33x10 array which stores the final actions
+int faction[34][12]; //33x10 array which stores the final actions----'1':hit;'2':stand;'3':double;'4':split
 
 struct State {
     // int pstateno; //ranges from 1 to 33 as per problem statement, 1-15 simple cases; 16-23 one card A another some simple card(not face); 24-33 pairs
@@ -353,6 +364,9 @@ int doublereward(State* s, int deal)
 }
 
 //reward when splits
+
+
+//dealing with pair=1 and pair=0
 int splitreward(State* s, int deal)
 {
     //when pair is non-ace i.e. 2-2,.........10-10
@@ -360,12 +374,18 @@ int splitreward(State* s, int deal)
     {
         // if a face-card comes up
         int reward;
+        int rewardfacepair;
+        int rewardfacenotpair;
         int rewardface;
         State* temps;
         statecopy(temps,s);
         temps->playerval=temps->playerval/2+10;
-        rewardface=freward[statetonumber(temps)][temps->dealerval];
-        reward=p*rewardface;
+        
+        rewardfacepair=freward[statetonumber(temps)][temps->dealerval];
+        temps->pair=false;
+        rewardfacenotpair=freward[statetonumber(temps)][temps->dealerval];
+        rewardface=
+        reward=p*(rewardface;
         // if a non-face card comes up
         for(int i=2;i<=9;i++)
         {
@@ -412,3 +432,67 @@ int splitreward(State* s, int deal)
         return 2*reward;//because there are 2 hands like these
     }
 } 
+
+void finalreward(State* s, int deal)
+{
+    int hreward,sreward,preward,dreward;
+    hreward=hitreward(s,deal);
+    sreward=standreward(s,deal);
+    if(s->pair==true)
+    {
+        dreward=doublereward(s,deal);
+        preward=splitreward(s,deal);
+        if(hreward>=sreward && hreward>=dreward && hreward>=preward)
+        {
+            freward[statetonumber(s)][s->dealerval]=hreward;
+            faction[statetonumber(s)][s->dealerval]=1;
+        }
+        else if(sreward>=hreward && sreward>=dreward && sreward>=preward)
+        {
+            freward[statetonumber(s)][s->dealerval]=sreward;
+            faction[statetonumber(s)][s->dealerval]=2;
+        }
+        else if(dreward>=sreward && dreward>=hreward && dreward>=preward)
+        {
+            freward[statetonumber(s)][s->dealerval]=dreward;
+            faction[statetonumber(s)][s->dealerval]=3;
+        }
+        else
+        {
+            freward[statetonumber(s)][s->dealerval]=preward;
+            faction[statetonumber(s)][s->dealerval]=4;
+        }
+    }
+    else if(s->playercardlen==2)
+    {
+        dreward=doublereward(s,deal);
+        if(hreward>=sreward && hreward>=dreward)
+        {
+            freward[statetonumber(s)][s->dealerval]=hreward;
+            faction[statetonumber(s)][s->dealerval]=1;
+        }
+        else if(sreward>=hreward && sreward>=dreward)
+        {
+            freward[statetonumber(s)][s->dealerval]=sreward;
+            faction[statetonumber(s)][s->dealerval]=2;
+        }
+        else
+        {
+            freward[statetonumber(s)][s->dealerval]=dreward;
+            faction[statetonumber(s)][s->dealerval]=3;
+        }
+    }
+    else
+    {
+        if(hreward>=sreward)
+        {
+            freward[statetonumber(s)][s->dealerval]=hreward;
+            faction[statetonumber(s)][s->dealerval]=1;
+        }
+        else
+        {
+            freward[statetonumber(s)][s->dealerval]=sreward;
+            faction[statetonumber(s)][s->dealerval]=2;
+        }
+    }
+}
