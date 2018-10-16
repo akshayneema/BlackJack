@@ -1,7 +1,9 @@
 #include <iostream>
 #include <cstdlib>
 using namespace std;
-
+/*KEY POINTS:
+>> 21 point ke baad bhi chal skte hai unless it is a black jack 21 i.e. len=2
+>> above point ka exception hai ace spliting in which 21 with len=2 is considered as normal 21*/
 
 
 
@@ -17,11 +19,6 @@ int freward[34][12]; //33x10 array which stores the final rewards
 int faction[34][12]; //33x10 array which stores the final actions----'1':hit;'2':stand;'3':double;'4':split
 
 struct State {
-    // int pstateno; //ranges from 1 to 33 as per problem statement, 1-15 simple cases; 16-23 one card A another some simple card(not face); 24-33 pairs
-    // int dealercard;// ranges from 2-11
-    // int pvalue;// sum of value of player's card
-    // vector<int> playercards; // player's cards
-    // vector<int> dealercards;    // dealer's cards
     int playerval; //player's hand value
     int playersofta; // no. of soft A's in player's hand
     int playercardlen;
@@ -60,7 +57,7 @@ void statecopy(State* tostate, State* fromstate)
     tostate->dealersofta=fromstate->dealersofta;
     tostate->dealercardlen=fromstate->dealercardlen;
 }
-//NEED TO ADD BLACK-JACK FEATURE ALSO
+//NEED TO ADD BLACK-JACK FEATURE ALSO. PLAYER BLACK-JACK AS WELL AS DEALER BLACK-JACK.
 int standreward(State* s, int deal)//expected reward after player stands. only dealer is making moves now.
 {
     int reward;
@@ -369,28 +366,27 @@ int doublereward(State* s, int deal)
 //dealing with pair=1 and pair=0
 int splitreward(State* s, int deal)
 {
-    //when pair is non-ace i.e. 2-2,.........10-10
-    if(statetonumber(s)>=24 && statetonumber(s)<=32)
+    //when pair is non-ace non-face i.e. 2-2,.........9-9
+    if(statetonumber(s)>=24 && statetonumber(s)<=31)
     {
-        // if a face-card comes up
+        // if a face-card comes up.. splitted hands won't have pair.
         int reward;
-        int rewardfacepair;
-        int rewardfacenotpair;
         int rewardface;
         State* temps;
         statecopy(temps,s);
         temps->playerval=temps->playerval/2+10;
-        
-        rewardfacepair=freward[statetonumber(temps)][temps->dealerval];
         temps->pair=false;
-        rewardfacenotpair=freward[statetonumber(temps)][temps->dealerval];
-        rewardface=
-        reward=p*(rewardface;
-        // if a non-face card comes up
+        rewardface=freward[statetonumber(temps)][temps->dealerval];
+        reward=p*rewardface;
+        // if a non-face card comes up.. chances of becoming a pair
         for(int i=2;i<=9;i++)
         {
             int rewardnonface;
             statecopy(temps,s);
+            if(temps->playerval/2==i)
+                temps->pair=true;
+            else
+                temps->pair=false;
             temps->playerval=temps->playerval/2+i;
             rewardnonface=freward[statetonumber(temps)][temps->dealerval];
             reward=reward+((1-p)/9)*rewardnonface;
@@ -400,7 +396,39 @@ int splitreward(State* s, int deal)
         statecopy(temps,s);
         temps->playerval=temps->playerval/2+11;
         temps->playersofta=temps->playersofta+1;
+        temps->pair=false;
         rewardace=freward[statetonumber(temps)][temps->dealerval];
+        reward=reward+((1-p)/9)*rewardace;
+        return 2*reward;//because there are 2 hands like these
+    }
+    else if(statetonumber(s)==32)// pair 10-10
+    {
+        // if a face-card comes up.. splitted hands won't have pair.
+        int reward;
+        int rewardface;
+        State* temps;
+        statecopy(temps,s);
+        temps->playerval=10+10;
+        temps->pair=true;
+        rewardface=freward[statetonumber(temps)][temps->dealerval];
+        reward=p*rewardface;
+        // if a non-face card comes up.. chances of becoming a pair
+        for(int i=2;i<=9;i++)
+        {
+            int rewardnonface;
+            statecopy(temps,s);
+            temps->pair=false;
+            temps->playerval=10+i;
+            rewardnonface=freward[statetonumber(temps)][temps->dealerval];
+            reward=reward+((1-p)/9)*rewardnonface;
+        }
+        //if ACE comes up------ IS THIS BLACK JACK???? YES!! THIS IS BLACK-JACK(resolved)
+        int rewardace;
+        statecopy(temps,s);
+        temps->playerval=10+11;
+        temps->playersofta=temps->playersofta+1;
+        temps->pair=false;
+        rewardace=standreward(temps,deal);
         reward=reward+((1-p)/9)*rewardace;
         return 2*reward;//because there are 2 hands like these
     }
@@ -411,7 +439,8 @@ int splitreward(State* s, int deal)
         int rewardface;
         State* temps;
         statecopy(temps,s);
-        temps->playerval=11+10;//-----IS THIS BLACK-JACK??? NO!! IT'S AN EXCEPTION.
+        temps->playerval=11+10;//-----IS THIS BLACK-JACK??? NO!! IT'S AN EXCEPTION(resolved)
+        //but standreward will consider it as a black-jack. so, change the playercardlen.
         rewardface=standreward(temps,deal);
         reward=p*rewardface;
         // if a non-face card comes up
@@ -463,7 +492,7 @@ void finalreward(State* s, int deal)
             faction[statetonumber(s)][s->dealerval]=4;
         }
     }
-    else if(s->playercardlen==2)
+    else if(s->playercardlen==2 && s->playerval!=21)//NOT BLACK-JACK
     {
         dreward=doublereward(s,deal);
         if(hreward>=sreward && hreward>=dreward)
@@ -481,6 +510,11 @@ void finalreward(State* s, int deal)
             freward[statetonumber(s)][s->dealerval]=dreward;
             faction[statetonumber(s)][s->dealerval]=3;
         }
+    }
+    else if(s->playercardlen==2 && s->playerval==21)//BLACK-JACK  //only stand applicable
+    {
+        freward[statetonumber(s)][s->dealerval]=sreward;
+        faction[statetonumber(s)][s->dealerval]=2;
     }
     else
     {
