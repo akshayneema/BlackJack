@@ -62,9 +62,14 @@ int standreward(State* s, int deal)//expected reward after player stands. only d
 {
     int reward;
     int rewardface;
-    //reward to player face-card
+    //reward to player if face-card appears
     if(s->dealerval+10>21 && s->dealersofta==0)//dealer busts
-        rewardface=deal;
+    {
+        if(s->playerval==21 && s->playercardlen==2)//player black jack
+            rewardface=1.5*deal;
+        else
+            rewardface=deal;
+    }
     else if(s->dealerval+10>21 && s->dealersofta!=0)//dealer uses soft A
     {
         State* temps;
@@ -73,16 +78,39 @@ int standreward(State* s, int deal)//expected reward after player stands. only d
         temps->dealercardlen=temps->dealercardlen+1;
         rewardface=standreward(temps,deal);
     }
-    else if(s->dealerval+10<=21)
+    else if(s->dealerval+10==21 && s->dealercardlen==1)// dealer black jack
+    {
+        if(s->playerval==21 && s->playercardlen==2)//player black jack
+            rewardface=0;//push
+        else
+            rewardface=-1*deal;//lost
+    }
+    else if(s->dealerval+10==21 && s->dealercardlen!=1)// dealer non black-jack 21
+    {
+        if(s->playerval==21 && s->playercardlen==2)//player black jack
+            rewardface=1.5*deal;//win
+        else if(s->playerval==21 && s->playercardlen!=2)
+            rewardface=0;//push
+        else 
+            rewardface=-1*deal;//lost
+    }
+    else if(s->dealerval+10<21)
     {
         if(s->dealerval+10>=17)//stands(controversial)
         {
             if(s->dealerval+10>s->playerval)//player looses
                 rewardface=-1*deal;
             else if(s->dealerval+10==s->playerval)//PUSH
+            {
                 rewardface=0;
+            }
             else//player wins
-                rewardface=1*deal;
+            {
+                if(s->playerval==21 && s->playercardlen==2)//player black jack
+                    rewardface=1.5*deal;
+                else
+                    rewardface=1*deal;
+            }
         }
         else//dealer continues hitting
         {
@@ -176,6 +204,7 @@ int standreward(State* s, int deal)//expected reward after player stands. only d
         }
     }
     reward=reward+((1-p)/9)*rewardace;
+    
     return reward;
 }
 
