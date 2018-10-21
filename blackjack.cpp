@@ -15,8 +15,10 @@ using namespace std;
 
 
 const int p;
-int freward[34][12]; //33x10 array which stores the final rewards
-int faction[34][12]; //33x10 array which stores the final actions----'1':hit;'2':stand;'3':double;'4':split
+
+//state space changed as more than 2 card hand can't perform doubling move
+int freward[57][12]; //33x10 array which stores the final rewards
+int faction[57][12]; //33x10 array which stores the final actions----'1':hit;'2':stand;'3':double;'4':split
 
 struct State {
     int playerval; //player's hand value
@@ -33,11 +35,23 @@ int statetonumber(State* s)//get your state number rn
 {
     if(s->playersofta==1)
     {
-        if(s->playerval==12)//pair of ace--AA 33
-            return 33;
-        else//one Ace and other non-face card 16 to 23
+        if(s->playercardlen==2)
         {
-            return s->playerval+3;
+            if(s->playerval==12)//pair of ace--AA 33 
+                return 33;
+            else//one Ace and other non-face card 16 to 23
+            {
+                return s->playerval+3;
+            }
+        }
+        else
+        {
+            if(s->playerval==12)//not possible
+                return 33+33;
+            else//one Ace and other non-face cards 49 to 56
+            {
+                return s->playerval+3+33;
+            }
         }
     }
     else if(s->pair==true)
@@ -45,8 +59,73 @@ int statetonumber(State* s)//get your state number rn
         return 22+s->playerval/2;//24 to 32
     }
     else
-        return s->playerval-4;//simple cases 1 to 15
+    {
+        if(s->playercardlen==2)
+            return s->playerval-4;//simple cases of two card hand 1 to 15
+        else
+            return s->playerval-4+33;// simple case of more than two card hand 34 to 48
+    }
 }
+
+State* numbertostate(int sno, int dno)
+{
+    State* s;
+    if(sno>=1 && sno<=15)
+    {
+        s->playerval=sno+4;
+        s->playersofta=0;
+        s->playercardlen=2;
+        s->pair=false;
+    }
+    else if(sno>=16 && sno<=23)
+    {
+        s->playerval=sno-3;
+        s->playersofta=1;
+        s->playercardlen=2;
+        s->pair=false;
+    }
+    else if(sno>=24 && sno<=32)
+    {
+        s->playerval=2*(sno-22);
+        s->playersofta=0;
+        s->playercardlen=2;
+        s->pair=true;
+    }
+    else if(sno==33)
+    {
+        s->playerval=12;
+        s->playersofta=1;
+        s->playercardlen=2;
+        s->pair=true;
+    }
+    else if(sno>=34 && sno<=48)
+    {
+        s->playerval=sno+4-33;
+        s->playersofta=0;
+        s->playercardlen=3;
+        s->pair=false;
+    }
+    else if(sno>=49 && sno<=56)
+    {
+        s->playerval=sno-3-33;
+        s->playersofta=1;
+        s->playercardlen=3;
+        s->pair=false;
+    }
+    if(dno>=2 && dno<=10)
+    {
+        s->dealerval=dno;
+        s->dealersofta=0;
+        s->dealercardlen=1;
+    }
+    else if(dno==11)
+    {
+        s->dealerval=dno;
+        s->dealersofta=1;
+        s->dealercardlen=1;
+    }
+}
+
 
 void statecopy(State* tostate, State* fromstate)
 {
@@ -56,6 +135,7 @@ void statecopy(State* tostate, State* fromstate)
     tostate->dealerval=fromstate->dealerval;
     tostate->dealersofta=fromstate->dealersofta;
     tostate->dealercardlen=fromstate->dealercardlen;
+    tostate->pair=fromstate->pair;
 }
 //NEED TO ADD BLACK-JACK FEATURE ALSO. PLAYER BLACK-JACK AS WELL AS DEALER BLACK-JACK.
 int standreward(State* s, int deal)//expected reward after player stands. only dealer is making moves now.
