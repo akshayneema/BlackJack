@@ -1,0 +1,84 @@
+enter p
+80
+1503.39
+3672.25
+587.204
+24.0787
+8.4792
+3.13609
+0.965325
+0.261346
+0.0651662
+0.0156153
+0.00358734
+0.000699393
+0.000225609
+9.02434e-05
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+faction[1][2] = 1 faction[1][3] = 1 faction[1][4] = 1 faction[1][5] = 1 faction[1][6] = 1 faction[1][7] = 1 faction[1][8] = 1 faction[1][9] = 1 faction[1][10] = 1 faction[1][11] = 1 
+faction[2][2] = 1 faction[2][3] = 1 faction[2][4] = 1 faction[2][5] = 1 faction[2][6] = 1 faction[2][7] = 1 faction[2][8] = 1 faction[2][9] = 1 faction[2][10] = 1 faction[2][11] = 1 
+faction[3][2] = 1 faction[3][3] = 1 faction[3][4] = 1 faction[3][5] = 1 faction[3][6] = 1 faction[3][7] = 1 faction[3][8] = 1 faction[3][9] = 1 faction[3][10] = 1 faction[3][11] = 1 
+faction[4][2] = 1 faction[4][3] = 1 faction[4][4] = 1 faction[4][5] = 1 faction[4][6] = 1 faction[4][7] = 1 faction[4][8] = 1 faction[4][9] = 1 faction[4][10] = 1 faction[4][11] = 1 
+faction[5][2] = 1 faction[5][3] = 1 faction[5][4] = 1 faction[5][5] = 1 faction[5][6] = 3 faction[5][7] = 1 faction[5][8] = 1 faction[5][9] = 1 faction[5][10] = 1 faction[5][11] = 1 
+faction[6][2] = 3 faction[6][3] = 3 faction[6][4] = 3 faction[6][5] = 3 faction[6][6] = 3 faction[6][7] = 3 faction[6][8] = 3 faction[6][9] = 3 faction[6][10] = 3 faction[6][11] = 1 
+faction[7][2] = 3 faction[7][3] = 3 faction[7][4] = 3 faction[7][5] = 3 faction[7][6] = 3 faction[7][7] = 3 faction[7][8] = 3 faction[7][9] = 3 faction[7][10] = 3 faction[7][11] = 1 
+faction[8][2] = 2 faction[8][3] = 2 faction[8][4] = 2 faction[8][5] = 2 faction[8][6] = 2 faction[8][7] = 1 faction[8][8] = 1 faction[8][9] = 1 faction[8][10] = 2 faction[8][11] = 1 
+faction[9][2] = 2 faction[9][3] = 2 faction[9][4] = 2 faction[9][5] = 2 faction[9][6] = 2 faction[9][7] = 1 faction[9][8] = 1 faction[9][9] = 2 faction[9][10] = 2 faction[9][11] = 1 
+faction[10][2] = 2 faction[10][3] = 2 faction[10][4] = 2 faction[10][5] = 2 faction[10][6] = 2 faction[10][7] = 1 faction[10][8] = 2 faction[10][9] = 2 faction[10][10] = 2 faction[10][11] = 1 
+faction[11][2] = 2 faction[11][3] = 2 faction[11][4] = 2 faction[11][5] = 2 faction[11][6] = 2 faction[11][7] = 2 faction[11][8] = 2 faction[11][9] = 2 faction[11][10] = 2 faction[11][11] = 2 
+faction[12][2] = 2 faction[12][3] = 2 faction[12][4] = 2 faction[12][5] = 2 faction[12][6] = 2 faction[12][7] = 2 faction[12][8] = 2 faction[12][9] = 2 faction[12][10] = 2 faction[12][11] = 2 
+faction[13][2] = 2 faction[13][3] = 2 faction[13][4] = 2 faction[13][5] = 2 faction[13][6] = 2 faction[13][7] = 2 faction[13][8] = 2 faction[13][9] = 2 faction[13][10] = 2 faction[13][11] = 2 
+faction[14][2] = 2 faction[14][3] = 2 faction[14][4] = 2 faction[14][5] = 2 faction[14][6] = 2 faction[14][7] = 2 faction[14][8] = 2 faction[14][9] = 2 faction[14][10] = 2 faction[14][11] = 2 
+faction[15][2] = 2 faction[15][3] = 2 faction[15][4] = 2 faction[15][5] = 2 faction[15][6] = 2 faction[15][7] = 2 faction[15][8] = 2 faction[15][9] = 2 faction[15][10] = 2 faction[15][11] = 2 
+faction[16][2] = 1 faction[16][3] = 1 faction[16][4] = 1 faction[16][5] = 3 faction[16][6] = 3 faction[16][7] = 1 faction[16][8] = 1 faction[16][9] = 1 faction[16][10] = 1 faction[16][11] = 1 
+faction[17][2] = 1 faction[17][3] = 1 faction[17][4] = 3 faction[17][5] = 3 faction[17][6] = 3 faction[17][7] = 1 faction[17][8] = 1 faction[17][9] = 1 faction[17][10] = 1 faction[17][11] = 1 
+faction[18][2] = 1 faction[18][3] = 1 faction[18][4] = 3 faction[18][5] = 3 faction[18][6] = 3 faction[18][7] = 1 faction[18][8] = 1 faction[18][9] = 1 faction[18][10] = 1 faction[18][11] = 1 
+faction[19][2] = 1 faction[19][3] = 3 faction[19][4] = 3 faction[19][5] = 3 faction[19][6] = 3 faction[19][7] = 1 faction[19][8] = 1 faction[19][9] = 1 faction[19][10] = 1 faction[19][11] = 1 
+faction[20][2] = 3 faction[20][3] = 3 faction[20][4] = 3 faction[20][5] = 3 faction[20][6] = 3 faction[20][7] = 1 faction[20][8] = 1 faction[20][9] = 1 faction[20][10] = 1 faction[20][11] = 1 
+faction[21][2] = 3 faction[21][3] = 3 faction[21][4] = 3 faction[21][5] = 3 faction[21][6] = 3 faction[21][7] = 2 faction[21][8] = 2 faction[21][9] = 1 faction[21][10] = 2 faction[21][11] = 2 
+faction[22][2] = 2 faction[22][3] = 2 faction[22][4] = 2 faction[22][5] = 2 faction[22][6] = 3 faction[22][7] = 2 faction[22][8] = 2 faction[22][9] = 2 faction[22][10] = 2 faction[22][11] = 2 
+faction[23][2] = 2 faction[23][3] = 2 faction[23][4] = 2 faction[23][5] = 2 faction[23][6] = 2 faction[23][7] = 2 faction[23][8] = 2 faction[23][9] = 2 faction[23][10] = 2 faction[23][11] = 2 
+faction[24][2] = 1 faction[24][3] = 1 faction[24][4] = 1 faction[24][5] = 1 faction[24][6] = 1 faction[24][7] = 1 faction[24][8] = 1 faction[24][9] = 1 faction[24][10] = 1 faction[24][11] = 1 
+faction[25][2] = 1 faction[25][3] = 1 faction[25][4] = 1 faction[25][5] = 1 faction[25][6] = 1 faction[25][7] = 1 faction[25][8] = 1 faction[25][9] = 1 faction[25][10] = 1 faction[25][11] = 1 
+faction[26][2] = 1 faction[26][3] = 1 faction[26][4] = 1 faction[26][5] = 1 faction[26][6] = 1 faction[26][7] = 1 faction[26][8] = 1 faction[26][9] = 1 faction[26][10] = 1 faction[26][11] = 1 
+faction[27][2] = 3 faction[27][3] = 3 faction[27][4] = 3 faction[27][5] = 3 faction[27][6] = 3 faction[27][7] = 1 faction[27][8] = 3 faction[27][9] = 3 faction[27][10] = 1 faction[27][11] = 1 
+faction[28][2] = 1 faction[28][3] = 4 faction[28][4] = 4 faction[28][5] = 4 faction[28][6] = 4 faction[28][7] = 1 faction[28][8] = 1 faction[28][9] = 1 faction[28][10] = 1 faction[28][11] = 1 
+faction[29][2] = 4 faction[29][3] = 4 faction[29][4] = 4 faction[29][5] = 4 faction[29][6] = 4 faction[29][7] = 4 faction[29][8] = 1 faction[29][9] = 1 faction[29][10] = 1 faction[29][11] = 1 
+faction[30][2] = 4 faction[30][3] = 4 faction[30][4] = 4 faction[30][5] = 4 faction[30][6] = 4 faction[30][7] = 4 faction[30][8] = 4 faction[30][9] = 2 faction[30][10] = 2 faction[30][11] = 1 
+faction[31][2] = 4 faction[31][3] = 4 faction[31][4] = 4 faction[31][5] = 4 faction[31][6] = 4 faction[31][7] = 2 faction[31][8] = 4 faction[31][9] = 4 faction[31][10] = 2 faction[31][11] = 2 
+faction[32][2] = 2 faction[32][3] = 2 faction[32][4] = 2 faction[32][5] = 2 faction[32][6] = 2 faction[32][7] = 2 faction[32][8] = 2 faction[32][9] = 2 faction[32][10] = 2 faction[32][11] = 2 
+faction[33][2] = 1 faction[33][3] = 1 faction[33][4] = 1 faction[33][5] = 1 faction[33][6] = 1 faction[33][7] = 1 faction[33][8] = 1 faction[33][9] = 1 faction[33][10] = 1 faction[33][11] = 1 

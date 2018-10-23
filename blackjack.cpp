@@ -218,7 +218,7 @@ float standreward(State &s, float deal, float p)//expected reward after player s
                 if(s.playerval==21 && s.playercardlen==2)//player black jack
                     rewardface=1.5*deal;
                 else
-                    rewardface=1*deal;
+                    rewardface=deal;
             }
         }
         else//dealer continues hitting
@@ -237,7 +237,12 @@ float standreward(State &s, float deal, float p)//expected reward after player s
     {
         float rewardnonface;
         if(s.dealerval+i>21 && s.dealersofta==0)//bust
-            rewardnonface=deal;
+        {
+            if(s.playerval==21 && s.playercardlen==2)//player black jack
+                rewardnonface=1.5*deal;
+            else
+                rewardnonface=deal;
+        }
         else if(s.dealerval+i>21 && s.dealersofta!=0)//use soft A
         {
             State temps;
@@ -247,7 +252,16 @@ float standreward(State &s, float deal, float p)//expected reward after player s
             temps.dealerval=temps.dealerval+i-10;
             rewardnonface=standreward(temps,deal,p);
         }
-        else if(s.dealerval+i<=21)
+        else if(s.dealerval+i==21 && s.dealercardlen!=1)// dealer non black-jack 21
+        {
+            if(s.playerval==21 && s.playercardlen==2)//player black jack
+                rewardface=1.5*deal;//win
+            else if(s.playerval==21 && s.playercardlen!=2)
+                rewardface=0;//push
+            else 
+                rewardface=-1*deal;//lost
+        }
+        else if(s.dealerval+i<21)
         {
             if(s.dealerval+i>=17)//stands(controversial)
             {
@@ -256,7 +270,12 @@ float standreward(State &s, float deal, float p)//expected reward after player s
                 else if(s.dealerval+i==s.playerval)//PUSH
                     rewardnonface=0;
                 else//player wins
-                    rewardnonface=1*deal;
+                {
+                    if(s.playerval==21 && s.playercardlen==2)//player black jack
+                        rewardface=1.5*deal;
+                    else
+                        rewardface=deal;
+                }
             }
             else//dealer continues hitting
             {
@@ -280,7 +299,12 @@ float standreward(State &s, float deal, float p)//expected reward after player s
             else if(s.dealerval+1==s.playerval)//PUSH
                 rewardace=0;
             else//player wins
-                rewardace=1*deal;   
+            {
+                if(s.playerval==21 && s.playercardlen==2)//player black jack
+                    rewardface=1.5*deal;
+                else
+                    rewardace=1*deal;   
+            }
         }
         else//dealer continues hitting
         {
@@ -291,6 +315,22 @@ float standreward(State &s, float deal, float p)//expected reward after player s
             rewardace=standreward(temps,deal,p);
         }
     }
+    else if(s.dealerval+11==21 && s.dealercardlen==1)//Dealer Black Jack
+    {
+        if(s.playerval==21 && s.playercardlen==2)//player black jack
+            rewardface=0;//push
+        else
+            rewardface=-1*deal;//lost
+    }
+    else if(s.dealerval+11==21 && s.dealercardlen!=1)//Dealer Non Black Jack 21
+    {
+        if(s.playerval==21 && s.playercardlen==2)//player black jack
+            rewardface=1.5*deal;//win
+        else if(s.playerval==21 && s.playercardlen!=2)
+            rewardface=0;//push
+        else 
+            rewardface=-1*deal;//lost
+    }
     else
     {
         if(s.dealerval+11>=17)
@@ -300,7 +340,12 @@ float standreward(State &s, float deal, float p)//expected reward after player s
             else if(s.dealerval+11==s.playerval)//PUSH
                 rewardace=0;
             else//player wins
-                rewardace=1*deal;   
+            {
+                if(s.playerval==21 && s.playercardlen==2)//player black jack
+                    rewardface=1.5*deal;
+                else
+                    rewardace=1*deal;  
+            } 
         }
         else
         {
@@ -332,19 +377,30 @@ float hitreward(State &s, int deal,float p)
         temps.playersofta=temps.playersofta-1;
         temps.playercardlen=temps.playercardlen+1;
         rewardface=freward[statetonumber(temps)][s.dealerval];
+        // rewardface=finalreward(temps,deal,p);
     }
-    else if(s.playerval+10<=21)
+    else if(s.playerval+10<21)
     {
 
-            State temps;
-            // cout<<"before statecopy"<<endl;
-            statecopy(temps,s);
-            // cout<<"after statecopy"<<endl;
-            temps.playerval=temps.playerval+10;
-            temps.playercardlen=temps.playercardlen+1;
-            // cout<<"s no."<<statetonumber(temps)<<endl;
-            rewardface=freward[statetonumber(temps)][s.dealerval];
-            // cout<<"end after statecopy"<<endl;
+        State temps;
+        // cout<<"before statecopy"<<endl;
+        statecopy(temps,s);
+        // cout<<"after statecopy"<<endl;
+        temps.playerval=temps.playerval+10;
+        temps.playercardlen=temps.playercardlen+1;
+        // cout<<"s no."<<statetonumber(temps)<<endl;
+        rewardface=freward[statetonumber(temps)][s.dealerval];
+        // cout<<"end after statecopy"<<endl;
+    }
+    else if(s.playerval+10==21)
+    {
+        State temps;
+        // cout<<"before statecopy"<<endl;
+        statecopy(temps,s);
+        // cout<<"after statecopy"<<endl;
+        temps.playerval=temps.playerval+10;
+        temps.playercardlen=temps.playercardlen+1;
+        rewardface=standreward(temps,deal,p);
     }
     reward=p*rewardface;
     //reward to player if non-face card appears(loop-check in sequence)
@@ -363,7 +419,7 @@ float hitreward(State &s, int deal,float p)
             temps.playerval=temps.playerval+i-10;
             rewardnonface=freward[statetonumber(temps)][s.dealerval];
         }
-        else if(s.playerval+i<=21)
+        else if(s.playerval+i<21)
         {
             State temps;
             statecopy(temps,s);
@@ -371,33 +427,39 @@ float hitreward(State &s, int deal,float p)
             temps.playercardlen=temps.playercardlen+1;
             rewardnonface=freward[statetonumber(temps)][s.dealerval];
         }
+        else if(s.playerval+10==21)
+        {
+            State temps;
+            // cout<<"before statecopy"<<endl;
+            statecopy(temps,s);
+            // cout<<"after statecopy"<<endl;
+            temps.playerval=temps.playerval+i;
+            temps.playercardlen=temps.playercardlen+1;
+            rewardface=standreward(temps,deal,p);
+        }
         reward=reward+((1-p)/9)*rewardnonface;
     }
     //when ace comes out
     float rewardace;
     if(s.playerval+11>21)//soft ACE leading to busting
     {
-        if(s.playerval+1>21 && s.playersofta==0)//hard ACE leading to busting
-        {
-            rewardace=-1*deal; 
-        }
-        else if(s.playerval+1>21 && s.playersofta!=0)
-        {
-            State temps;
-            statecopy(temps,s);
-            temps.playerval=temps.playerval+1-10;
-            temps.playercardlen=temps.playercardlen+1;
-            temps.playersofta=temps.playersofta-1;
+        State temps;
+        statecopy(temps,s);
+        temps.playerval=temps.playerval+1;
+        temps.playercardlen=temps.playercardlen+1;
+        if(s.playerval+1==21)
+            rewardface=standreward(temps,deal,p);
+        else
             rewardace=freward[statetonumber(temps)][s.dealerval];
-        }
-        else//dealer continues hitting
-        {
-            State temps;
-            statecopy(temps,s);
-            temps.playerval=temps.playerval+1;
-            temps.playercardlen=temps.playercardlen+1;
-            rewardace=freward[statetonumber(temps)][s.dealerval];
-        }
+    }
+    else if(s.playerval+11==21)
+    {
+        State temps;
+        statecopy(temps,s);
+        temps.playerval=temps.playerval+11;
+        temps.playercardlen=temps.playercardlen+1;
+        temps.playersofta=temps.playersofta+1;
+        rewardface=standreward(temps,deal,p);
     }
     else
     {
@@ -584,6 +646,7 @@ float splitreward(State &s, int deal,float p)
         statecopy(temps,s);
         temps.playerval=11+10;//-----IS THIS BLACK-JACK??? NO!! IT'S AN EXCEPTION(resolved)
         //but standreward will consider it as a black-jack. so, change the playercardlen.
+        temps.playercardlen=3;
         rewardface=standreward(temps,deal,p);
         reward=p*rewardface;
         // if a non-face card comes up
