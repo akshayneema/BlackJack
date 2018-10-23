@@ -18,9 +18,8 @@ using namespace std;
 // const int p=0.5;
 
 //state space changed as more than 2 card hand can't perform doubling move
-float freward[57][12]={}; //33x10 array which stores the final rewards
-int faction[57][12]={}; //33x10 array which stores the final actions----'1':hit;'2':stand;'3':double;'4':split
-
+float freward[58][12]={}; //33x10 array which stores the final rewards
+int faction[58][12]={}; //33x10 array which stores the final actions----'1':hit;'2':stand;'3':double;'4':split
 struct State {
     int playerval; //player's hand value
     int playersofta; // no. of soft A's in player's hand
@@ -76,7 +75,10 @@ int statetonumber(State &s)//get your state number rn
         else
         {
             // cout<<"playerval"<<s.playerval<<endl;
-            return s.playerval-4+33;// simple case of more than two card hand 34 to 48
+            if(s.playerval!=20)
+                return s.playerval-4+33;// simple case of more than two card hand 34 to 48
+            else
+                return 57;
         }
     }
 }
@@ -128,6 +130,13 @@ State numbertostate(int sno, int dno)
         s.playercardlen=3;
         s.pair=false;
     }
+    else if(sno==57)
+    {
+        s.playerval=20;
+        s.playersofta=0;
+        s.playercardlen=3;
+        s.pair=false;
+    }
     if(dno>=2 && dno<=10)
     {
         // cout<<"case1"<<endl;
@@ -166,7 +175,8 @@ void statecopy(State &tostate, State &fromstate)
     tostate.dealercardlen=fromstate.dealercardlen;
     tostate.pair=fromstate.pair;
 }
-//NEED TO ADD BLACK-JACK FEATURE ALSO. PLAYER BLACK-JACK AS WELL AS DEALER BLACK-JACK.
+//NEED TO AD
+//D BLACK-JACK FEATURE ALSO. PLAYER BLACK-JACK AS WELL AS DEALER BLACK-JACK.
 float standreward(State &s, float deal, float p)//expected reward after player stands. only dealer is making moves now.
 {
     float reward;
@@ -255,11 +265,11 @@ float standreward(State &s, float deal, float p)//expected reward after player s
         else if(s.dealerval+i==21 && s.dealercardlen!=1)// dealer non black-jack 21
         {
             if(s.playerval==21 && s.playercardlen==2)//player black jack
-                rewardface=1.5*deal;//win
+                rewardnonface=1.5*deal;//win
             else if(s.playerval==21 && s.playercardlen!=2)
-                rewardface=0;//push
+                rewardnonface=0;//push
             else 
-                rewardface=-1*deal;//lost
+                rewardnonface=-1*deal;//lost
         }
         else if(s.dealerval+i<21)
         {
@@ -272,9 +282,9 @@ float standreward(State &s, float deal, float p)//expected reward after player s
                 else//player wins
                 {
                     if(s.playerval==21 && s.playercardlen==2)//player black jack
-                        rewardface=1.5*deal;
+                        rewardnonface=1.5*deal;
                     else
-                        rewardface=deal;
+                        rewardnonface=deal;
                 }
             }
             else//dealer continues hitting
@@ -301,7 +311,7 @@ float standreward(State &s, float deal, float p)//expected reward after player s
             else//player wins
             {
                 if(s.playerval==21 && s.playercardlen==2)//player black jack
-                    rewardface=1.5*deal;
+                    rewardace=1.5*deal;
                 else
                     rewardace=1*deal;   
             }
@@ -318,18 +328,18 @@ float standreward(State &s, float deal, float p)//expected reward after player s
     else if(s.dealerval+11==21 && s.dealercardlen==1)//Dealer Black Jack
     {
         if(s.playerval==21 && s.playercardlen==2)//player black jack
-            rewardface=0;//push
+            rewardace=0;//push
         else
-            rewardface=-1*deal;//lost
+            rewardace=-1*deal;//lost
     }
     else if(s.dealerval+11==21 && s.dealercardlen!=1)//Dealer Non Black Jack 21
     {
         if(s.playerval==21 && s.playercardlen==2)//player black jack
-            rewardface=1.5*deal;//win
+            rewardace=1.5*deal;//win
         else if(s.playerval==21 && s.playercardlen!=2)
-            rewardface=0;//push
+            rewardace=0;//push
         else 
-            rewardface=-1*deal;//lost
+            rewardace=-1*deal;//lost
     }
     else
     {
@@ -342,7 +352,7 @@ float standreward(State &s, float deal, float p)//expected reward after player s
             else//player wins
             {
                 if(s.playerval==21 && s.playercardlen==2)//player black jack
-                    rewardface=1.5*deal;
+                    rewardace=1.5*deal;
                 else
                     rewardace=1*deal;  
             } 
@@ -427,7 +437,7 @@ float hitreward(State &s, int deal,float p)
             temps.playercardlen=temps.playercardlen+1;
             rewardnonface=freward[statetonumber(temps)][s.dealerval];
         }
-        else if(s.playerval+10==21)
+        else if(s.playerval+i==21)
         {
             State temps;
             // cout<<"before statecopy"<<endl;
@@ -465,7 +475,7 @@ float hitreward(State &s, int deal,float p)
     {
         State temps;
         statecopy(temps,s);
-        temps.playerval=temps.playerval+1;
+        temps.playerval=temps.playerval+11;
         temps.playercardlen=temps.playercardlen+1;
         temps.playersofta=temps.playersofta+1;
         rewardace=freward[statetonumber(temps)][s.dealerval];
@@ -556,7 +566,7 @@ float doublereward(State &s, int deal,float p)
     {
         State temps;
         statecopy(temps,s);
-        temps.playerval=temps.playerval+1;
+        temps.playerval=temps.playerval+11;
         temps.playercardlen=temps.playercardlen+1;
         temps.playersofta=temps.playersofta+1;
         rewardace=standreward(temps,deal,p);
@@ -637,7 +647,7 @@ float splitreward(State &s, int deal,float p)
         reward=reward+((1-p)/9)*rewardace;
         return 2*reward;//because there are 2 hands like these
     }
-    else//KAAFI EXCEPTIONS. IN SHORT SIRF STAND KR SKTE HAI.
+    else if(statetonumber(s)==33)//KAAFI EXCEPTIONS. IN SHORT SIRF STAND KR SKTE HAI.
     {
         // if a face-card comes up
         float reward;
@@ -688,6 +698,13 @@ void finalreward(State &s, int deal,float p)
         // cout<<"sreward="<<sreward<<endl;
         if(hreward>=sreward && hreward>=dreward && hreward>=preward)
         {
+            
+            // if(statetonumber(s)==33)
+            // {
+            //     cout<<"hit in AA"<<endl;
+            //     cout<<"33,"<<s.dealerval<<endl;
+            //     cout<<"hit="<<hreward<<",stand="<<sreward<<",double="<<dreward<<",split="<<preward<<endl;
+            // }
             freward[statetonumber(s)][s.dealerval]=hreward;
             faction[statetonumber(s)][s.dealerval]=1;
         }
@@ -703,6 +720,13 @@ void finalreward(State &s, int deal,float p)
         }
         else
         {
+            
+            // if(statetonumber(s)==33)
+            // {
+            //     cout<<"split in AA"<<endl;
+            //     cout<<"33,"<<s.dealerval<<endl;
+            //     cout<<"hit="<<hreward<<",stand="<<sreward<<",double="<<dreward<<",split="<<preward<<endl;
+            // }
             freward[statetonumber(s)][s.dealerval]=preward;
             faction[statetonumber(s)][s.dealerval]=4;
         }
@@ -811,5 +835,37 @@ int main()
         }
         cout<<endl;
     }
+    cout<<"about AA"<<endl;
+    cout<<"hit"<<endl;
+    for(int j=2;j<=11;j++)
+    {
+        State s=numbertostate(10,j);
+        cout<<hitreward(s,1,p)<<" ";
 
+    }
+    cout<<endl;
+    cout<<"stand"<<endl;
+    for(int j=2;j<=11;j++)
+    {
+        State s=numbertostate(10,j);
+        cout<<standreward(s,1,p)<<" ";
+
+    }
+    cout<<endl;
+    cout<<"double"<<endl;
+    for(int j=2;j<=11;j++)
+    {
+        State s=numbertostate(10,j);
+        cout<<doublereward(s,1,p)<<" ";
+
+    }
+    cout<<endl;
+    cout<<"split"<<endl;
+    for(int j=2;j<=11;j++)
+    {
+        State s=numbertostate(10,j);
+        cout<<splitreward(s,1,p)<<" ";
+
+    }
+    cout<<endl;
 }
