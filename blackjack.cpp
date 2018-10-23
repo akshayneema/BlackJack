@@ -445,7 +445,7 @@ float hitreward(State &s, int deal,float p)
             // cout<<"after statecopy"<<endl;
             temps.playerval=temps.playerval+i;
             temps.playercardlen=temps.playercardlen+1;
-            rewardface=standreward(temps,deal,p);
+            rewardnonface=standreward(temps,deal,p);
         }
         reward=reward+((1-p)/9)*rewardnonface;
     }
@@ -458,7 +458,7 @@ float hitreward(State &s, int deal,float p)
         temps.playerval=temps.playerval+1;
         temps.playercardlen=temps.playercardlen+1;
         if(s.playerval+1==21)
-            rewardface=standreward(temps,deal,p);
+            rewardace=standreward(temps,deal,p);
         else
             rewardace=freward[statetonumber(temps)][s.dealerval];
     }
@@ -469,7 +469,7 @@ float hitreward(State &s, int deal,float p)
         temps.playerval=temps.playerval+11;
         temps.playercardlen=temps.playercardlen+1;
         temps.playersofta=temps.playersofta+1;
-        rewardface=standreward(temps,deal,p);
+        rewardace=standreward(temps,deal,p);
     }
     else
     {
@@ -603,8 +603,11 @@ float splitreward(State &s, int deal,float p)
             else
                 temps.pair=false;
             temps.playerval=temps.playerval/2+i;
-            rewardnonface=freward[statetonumber(temps)][temps.dealerval];
-            reward=reward+((1-p)/9)*rewardnonface;
+            if(temps.pair==false)
+            {
+                rewardnonface=freward[statetonumber(temps)][temps.dealerval];
+                reward=reward+((1-p)/9)*rewardnonface;
+            }
         }
         //if ACE comes up
         float rewardace;
@@ -614,7 +617,7 @@ float splitreward(State &s, int deal,float p)
         temps.pair=false;
         rewardace=freward[statetonumber(temps)][temps.dealerval];
         reward=reward+((1-p)/9)*rewardace;
-        return 2*reward;//because there are 2 hands like these
+        return 2*reward/(1-2*((1-p)/9));//because there are 2 hands like these
     }
     else if(statetonumber(s)==32)// pair 10-10
     {
@@ -625,8 +628,8 @@ float splitreward(State &s, int deal,float p)
         statecopy(temps,s);
         temps.playerval=10+10;
         temps.pair=true;
-        rewardface=freward[statetonumber(temps)][temps.dealerval];
-        reward=p*rewardface;
+        // rewardface=freward[statetonumber(temps)][temps.dealerval];
+        reward=0;
         // if a non-face card comes up.. chances of becoming a pair
         for(int i=2;i<=9;i++)
         {
@@ -645,7 +648,7 @@ float splitreward(State &s, int deal,float p)
         temps.pair=false;
         rewardace=standreward(temps,deal,p);
         reward=reward+((1-p)/9)*rewardace;
-        return 2*reward;//because there are 2 hands like these
+        return 2*reward/(1-2*p);//because there are 2 hands like these
     }
     else if(statetonumber(s)==33)//KAAFI EXCEPTIONS. IN SHORT SIRF STAND KR SKTE HAI.
     {
@@ -677,6 +680,7 @@ float splitreward(State &s, int deal,float p)
         return 2*reward;//because there are 2 hands like these
     }
 } 
+
 
 void finalreward(State &s, int deal,float p)
 {
@@ -791,42 +795,101 @@ void finalreward(State &s, int deal,float p)
     }
 }
 
+void filldp(int deal, float p)
+{
+    State s;
+    for(int i=2;i<=11;i++)
+    {
+        s=numbertostate(57,i);
+        finalreward(s,deal,p);
+    }
+    for(int i=48;i>=39;i--)
+    {
+        for(int j=2;j<=11;j++)
+        {
+            s=numbertostate(i,j);
+            finalreward(s,deal,p);
+        }
+    }
+    for(int i=56;i>=49;i--)
+    {
+        for(int j=2;j<=11;j++)
+        {
+            s=numbertostate(i,j);
+            finalreward(s,deal,p);
+        }
+    }
+    for(int i=23;i>=16;i--)
+    {
+        for(int j=2;j<=11;j++)
+        {
+            s=numbertostate(i,j);
+            finalreward(s,deal,p);
+        }
+    }
+    for(int i=38;i>=34;i--)
+    {
+        for(int j=2;j<=11;j++)
+        {
+            s=numbertostate(i,j);
+            finalreward(s,deal,p);
+        }
+    }
+    for(int i=15;i>=1;i--)
+    {
+        for(int j=2;j<=11;j++)
+        {
+            s=numbertostate(i,j);
+            finalreward(s,deal,p);
+        }
+    }
+    for(int i=33;i>=24;i--)
+    {
+        for(int j=2;j<=11;j++)
+        {
+            s=numbertostate(i,j);
+            finalreward(s,deal,p);
+        }
+    }
+}
+
 int main()
 {
     float p,freward_temp,e_temp;
     cout<<"enter p"<<endl;
     cin>>p;float e=100.0; int k=0;
-    while(k<50)
-    {
-        e=0;
-        for(int i=1;i<=56;i++)
-        {
-            for(int j=2;j<=11;j++)
-            {
-                freward_temp=freward[i][j]; 
-                // cout<<"i="<<i<<",j="<<j<<endl;
-                State s=numbertostate(i,j);
-                finalreward(s,1,p);
-                if(freward_temp!=0)
-                e_temp=fabs(freward[i][j]-freward_temp)*100.0/freward_temp;
-                else
-                e_temp=80;
-                if(e_temp>e)
-                e=e_temp;
+    // while(k<50)
+    // {
+    //     e=0;
+    //     for(int i=1;i<=56;i++)
+    //     {
+    //         for(int j=2;j<=11;j++)
+    //         {
+    //             freward_temp=freward[i][j]; 
+    //             // cout<<"i="<<i<<",j="<<j<<endl;
+    //             State s=numbertostate(i,j);
+    //             finalreward(s,1,p);
+    //             if(freward_temp!=0)
+    //             e_temp=fabs(freward[i][j]-freward_temp)*100.0/freward_temp;
+    //             else
+    //             e_temp=80;
+    //             if(e_temp>e)
+    //             e=e_temp;
 
-                // State s=numbertostate(i,j);
-                // cout<<"details of s incoming"<<endl;
-                // cout<<"playerval="<<s.playerval<<endl;
-                // cout<<"playercardlen="<<s.playercardlen<<endl;
-                // cout<<"playersofta="<<s.playersofta<<endl;
-                // cout<<"dealerval="<<s.dealerval<<endl;
-                // cout<<"dealercardlen="<<s.dealercardlen<<endl;
-                // cout<<"dealersofta="<<s.dealersofta<<endl;
-            }
-        }
-        cout<<e<<endl;
-        k++;
-    }
+    //             // State s=numbertostate(i,j);
+    //             // cout<<"details of s incoming"<<endl;
+    //             // cout<<"playerval="<<s.playerval<<endl;
+    //             // cout<<"playercardlen="<<s.playercardlen<<endl;
+    //             // cout<<"playersofta="<<s.playersofta<<endl;
+    //             // cout<<"dealerval="<<s.dealerval<<endl;
+    //             // cout<<"dealercardlen="<<s.dealercardlen<<endl;
+    //             // cout<<"dealersofta="<<s.dealersofta<<endl;
+    //         }
+    //     }
+    //     cout<<e<<endl;
+    //     k++;
+    // }
+    filldp(1,p);
     for(int i=1;i<=33;i++)
     {
         for(int j=2;j<=11;j++)
@@ -835,37 +898,37 @@ int main()
         }
         cout<<endl;
     }
-    cout<<"about AA"<<endl;
-    cout<<"hit"<<endl;
-    for(int j=2;j<=11;j++)
-    {
-        State s=numbertostate(10,j);
-        cout<<hitreward(s,1,p)<<" ";
+    // cout<<"about AA"<<endl;
+    // cout<<"hit"<<endl;
+    // for(int j=2;j<=11;j++)
+    // {
+    //     State s=numbertostate(10,j);
+    //     cout<<hitreward(s,1,p)<<" ";
 
-    }
-    cout<<endl;
-    cout<<"stand"<<endl;
-    for(int j=2;j<=11;j++)
-    {
-        State s=numbertostate(10,j);
-        cout<<standreward(s,1,p)<<" ";
+    // }
+    // cout<<endl;
+    // cout<<"stand"<<endl;
+    // for(int j=2;j<=11;j++)
+    // {
+    //     State s=numbertostate(10,j);
+    //     cout<<standreward(s,1,p)<<" ";
 
-    }
-    cout<<endl;
-    cout<<"double"<<endl;
-    for(int j=2;j<=11;j++)
-    {
-        State s=numbertostate(10,j);
-        cout<<doublereward(s,1,p)<<" ";
+    // }
+    // cout<<endl;
+    // cout<<"double"<<endl;
+    // for(int j=2;j<=11;j++)
+    // {
+    //     State s=numbertostate(10,j);
+    //     cout<<doublereward(s,1,p)<<" ";
 
-    }
-    cout<<endl;
-    cout<<"split"<<endl;
-    for(int j=2;j<=11;j++)
-    {
-        State s=numbertostate(10,j);
-        cout<<splitreward(s,1,p)<<" ";
+    // }
+    // cout<<endl;
+    // cout<<"split"<<endl;
+    // for(int j=2;j<=11;j++)
+    // {
+    //     State s=numbertostate(10,j);
+    //     cout<<splitreward(s,1,p)<<" ";
 
-    }
-    cout<<endl;
+    // }
+    // cout<<endl;
 }
