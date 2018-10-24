@@ -19,7 +19,7 @@ using namespace std;
 
 //state space changed as more than 2 card hand can't perform doubling move
 float freward[58][12]={}; //33x10 array which stores the final rewards
-int faction[58][12]={}; //33x10 array which stores the final actions----'1':hit;'2':stand;'3':double;'4':split
+char faction[58][12]={}; //33x10 array which stores the final actions----'1':hit;'2':stand;'3':double;'4':split
 struct State {
     int playerval; //player's hand value
     int playersofta; // no. of soft A's in player's hand
@@ -386,6 +386,7 @@ float hitreward(State &s, int deal,float p)
         statecopy(temps,s);
         temps.playersofta=temps.playersofta-1;
         temps.playercardlen=temps.playercardlen+1;
+        temps.pair=false;
         rewardface=freward[statetonumber(temps)][s.dealerval];
         // rewardface=finalreward(temps,deal,p);
     }
@@ -398,6 +399,7 @@ float hitreward(State &s, int deal,float p)
         // cout<<"after statecopy"<<endl;
         temps.playerval=temps.playerval+10;
         temps.playercardlen=temps.playercardlen+1;
+        temps.pair=false;
         // cout<<"s no."<<statetonumber(temps)<<endl;
         rewardface=freward[statetonumber(temps)][s.dealerval];
         // cout<<"end after statecopy"<<endl;
@@ -410,6 +412,7 @@ float hitreward(State &s, int deal,float p)
         // cout<<"after statecopy"<<endl;
         temps.playerval=temps.playerval+10;
         temps.playercardlen=temps.playercardlen+1;
+        temps.pair=false;
         rewardface=standreward(temps,deal,p);
     }
     reward=p*rewardface;
@@ -427,6 +430,7 @@ float hitreward(State &s, int deal,float p)
             temps.playersofta=temps.playersofta-1;
             temps.playercardlen=temps.playercardlen+1;
             temps.playerval=temps.playerval+i-10;
+            temps.pair=false;
             rewardnonface=freward[statetonumber(temps)][s.dealerval];
         }
         else if(s.playerval+i<21)
@@ -435,6 +439,7 @@ float hitreward(State &s, int deal,float p)
             statecopy(temps,s);
             temps.playerval=temps.playerval+i;
             temps.playercardlen=temps.playercardlen+1;
+            temps.pair=false;
             rewardnonface=freward[statetonumber(temps)][s.dealerval];
         }
         else if(s.playerval+i==21)
@@ -445,6 +450,7 @@ float hitreward(State &s, int deal,float p)
             // cout<<"after statecopy"<<endl;
             temps.playerval=temps.playerval+i;
             temps.playercardlen=temps.playercardlen+1;
+            temps.pair=false;
             rewardnonface=standreward(temps,deal,p);
         }
         reward=reward+((1-p)/9)*rewardnonface;
@@ -457,6 +463,7 @@ float hitreward(State &s, int deal,float p)
         statecopy(temps,s);
         temps.playerval=temps.playerval+1;
         temps.playercardlen=temps.playercardlen+1;
+        temps.pair=false;
         if(s.playerval+1==21)
             rewardace=standreward(temps,deal,p);
         else
@@ -469,6 +476,7 @@ float hitreward(State &s, int deal,float p)
         temps.playerval=temps.playerval+11;
         temps.playercardlen=temps.playercardlen+1;
         temps.playersofta=temps.playersofta+1;
+        temps.pair=false;
         rewardace=standreward(temps,deal,p);
     }
     else
@@ -478,6 +486,7 @@ float hitreward(State &s, int deal,float p)
         temps.playerval=temps.playerval+11;
         temps.playercardlen=temps.playercardlen+1;
         temps.playersofta=temps.playersofta+1;
+        temps.pair=false;
         rewardace=freward[statetonumber(temps)][s.dealerval];
     }
     reward=reward+((1-p)/9)*rewardace;
@@ -589,34 +598,54 @@ float splitreward(State &s, int deal,float p)
         float rewardface;
         State temps;
         statecopy(temps,s);
-        temps.playerval=temps.playerval/2+10;
+        temps.playerval=(temps.playerval/2)+10;
         temps.pair=false;
+        temps.playercardlen=2;
         rewardface=freward[statetonumber(temps)][temps.dealerval];
         reward=p*rewardface;
+        // if(statetonumber(s)==24)
+        // {
+        //     cout<<"(24,"<<s.dealerval<<")"<<endl;
+        //     cout<<"rewardface="<<rewardface<<endl;
+        // }
         // if a non-face card comes up.. chances of becoming a pair
         for(int i=2;i<=9;i++)
         {
             float rewardnonface;
-            statecopy(temps,s);
-            if(temps.playerval/2==i)
-                temps.pair=true;
+            State temps1;
+            statecopy(temps1,s);
+            if(temps1.playerval/2==i)
+                temps1.pair=true;
             else
-                temps.pair=false;
-            temps.playerval=temps.playerval/2+i;
-            if(temps.pair==false)
+                temps1.pair=false;
+            temps1.playerval=(temps1.playerval/2)+i;
+            temps1.playercardlen=2;
+            if(temps1.pair==false)
             {
-                rewardnonface=freward[statetonumber(temps)][temps.dealerval];
+                rewardnonface=freward[statetonumber(temps1)][temps1.dealerval];
                 reward=reward+((1-p)/9)*rewardnonface;
             }
+            // if(statetonumber(s)==24)
+            // {
+            //     cout<<"(24,"<<s.dealerval<<")"<<endl;
+            //     cout<<"rewardnonface="<<rewardnonface<<endl;
+            // }
         }
         //if ACE comes up
         float rewardace;
-        statecopy(temps,s);
-        temps.playerval=temps.playerval/2+11;
-        temps.playersofta=temps.playersofta+1;
-        temps.pair=false;
-        rewardace=freward[statetonumber(temps)][temps.dealerval];
+        State temps2;
+        statecopy(temps2,s);
+        temps2.playerval=(temps2.playerval/2)+11;
+        temps2.playersofta=temps2.playersofta+1;
+        temps2.playercardlen=2;
+        temps2.pair=false;
+        rewardace=freward[statetonumber(temps2)][temps2.dealerval];
         reward=reward+((1-p)/9)*rewardace;
+        // if(statetonumber(s)==24)
+        // {
+        //     cout<<"(24,"<<s.dealerval<<")"<<endl;
+        //     cout<<"rewardace="<<rewardace<<endl;
+        // }
         return 2*reward/(1-2*((1-p)/9));//because there are 2 hands like these
     }
     else if(statetonumber(s)==32)// pair 10-10
@@ -628,25 +657,30 @@ float splitreward(State &s, int deal,float p)
         statecopy(temps,s);
         temps.playerval=10+10;
         temps.pair=true;
+        temps.playercardlen=2;
         // rewardface=freward[statetonumber(temps)][temps.dealerval];
         reward=0;
         // if a non-face card comes up.. chances of becoming a pair
         for(int i=2;i<=9;i++)
         {
             float rewardnonface;
-            statecopy(temps,s);
-            temps.pair=false;
-            temps.playerval=10+i;
-            rewardnonface=freward[statetonumber(temps)][temps.dealerval];
+            State temps1;
+            statecopy(temps1,s);
+            temps1.pair=false;
+            temps1.playerval=10+i;
+            temps1.playercardlen=2;
+            rewardnonface=freward[statetonumber(temps1)][temps1.dealerval];
             reward=reward+((1-p)/9)*rewardnonface;
         }
         //if ACE comes up------ IS THIS BLACK JACK???? YES!! THIS IS BLACK-JACK(resolved)
         float rewardace;
-        statecopy(temps,s);
-        temps.playerval=10+11;
-        temps.playersofta=temps.playersofta+1;
-        temps.pair=false;
-        rewardace=standreward(temps,deal,p);
+        State temps2;
+        statecopy(temps2,s);
+        temps2.playerval=10+11;
+        temps2.playersofta=temps2.playersofta+1;
+        temps2.pair=false;
+        temps2.playercardlen=2;
+        rewardace=standreward(temps2,deal,p);
         reward=reward+((1-p)/9)*rewardace;
         return 2*reward/(1-2*p);//because there are 2 hands like these
     }
@@ -666,16 +700,20 @@ float splitreward(State &s, int deal,float p)
         for(int i=2;i<=9;i++)
         {
             float rewardnonface;
-            statecopy(temps,s);
-            temps.playerval=11+i;
-            rewardnonface=standreward(temps,deal,p);
+            State temps1;
+            statecopy(temps1,s);
+            temps1.playerval=11+i;
+            temps1.playercardlen=2;
+            rewardnonface=standreward(temps1,deal,p);
             reward=reward+((1-p)/9)*rewardnonface;
         }
         //if ACE comes up
         float rewardace;
-        statecopy(temps,s);
-        temps.playerval=11+1;
-        rewardace=standreward(temps,deal,p);
+        State temps2;
+        statecopy(temps2,s);
+        temps2.playerval=11+1;
+        temps2.playercardlen=2;
+        rewardace=standreward(temps2,deal,p);
         reward=reward+((1-p)/9)*rewardace;
         return 2*reward;//because there are 2 hands like these
     }
@@ -690,17 +728,13 @@ void finalreward(State &s, int deal,float p)
     {
         // cout<<"pair before hit"<<endl;
         hreward=hitreward(s,deal,p);
-        // cout<<"hreward="<<hreward<<endl;
-        // cout<<"pair before stand"<<endl;
+        // hreward=-2;
         sreward=standreward(s,deal,p);
-        // cout<<"sreward="<<sreward<<endl;
-        // cout<<"pair before double"<<endl;
+        
         dreward=doublereward(s,deal,p);
-        // cout<<"dreward="<<dreward<<endl;
-        // cout<<"pair before split"<<endl;
         preward=splitreward(s,deal,p);
         // cout<<"sreward="<<sreward<<endl;
-        if(hreward>=sreward && hreward>=dreward && hreward>=preward)
+        if(hreward>sreward && hreward>dreward && hreward>preward)
         {
             
             // if(statetonumber(s)==33)
@@ -710,19 +744,19 @@ void finalreward(State &s, int deal,float p)
             //     cout<<"hit="<<hreward<<",stand="<<sreward<<",double="<<dreward<<",split="<<preward<<endl;
             // }
             freward[statetonumber(s)][s.dealerval]=hreward;
-            faction[statetonumber(s)][s.dealerval]=1;
+            faction[statetonumber(s)][s.dealerval]='H';
         }
-        else if(sreward>=hreward && sreward>=dreward && sreward>=preward)
+        else if(sreward>hreward && sreward>dreward && sreward>preward)
         {
             freward[statetonumber(s)][s.dealerval]=sreward;
-            faction[statetonumber(s)][s.dealerval]=2;
+            faction[statetonumber(s)][s.dealerval]='S';
         }
-        else if(dreward>=sreward && dreward>=hreward && dreward>=preward)
+        else if(dreward>sreward && dreward>hreward && dreward>preward)
         {
             freward[statetonumber(s)][s.dealerval]=dreward;
-            faction[statetonumber(s)][s.dealerval]=3;
+            faction[statetonumber(s)][s.dealerval]='D';
         }
-        else
+        else if(preward>hreward && preward>sreward && preward>dreward)
         {
             
             // if(statetonumber(s)==33)
@@ -732,7 +766,7 @@ void finalreward(State &s, int deal,float p)
             //     cout<<"hit="<<hreward<<",stand="<<sreward<<",double="<<dreward<<",split="<<preward<<endl;
             // }
             freward[statetonumber(s)][s.dealerval]=preward;
-            faction[statetonumber(s)][s.dealerval]=4;
+            faction[statetonumber(s)][s.dealerval]='P';
         }
         // cout<<"freward="<<freward[statetonumber(s)][s.dealerval]<<endl;
     }
@@ -750,17 +784,17 @@ void finalreward(State &s, int deal,float p)
         if(hreward>=sreward && hreward>=dreward)
         {
             freward[statetonumber(s)][s.dealerval]=hreward;
-            faction[statetonumber(s)][s.dealerval]=1;
+            faction[statetonumber(s)][s.dealerval]='H';
         }
         else if(sreward>=hreward && sreward>=dreward)
         {
             freward[statetonumber(s)][s.dealerval]=sreward;
-            faction[statetonumber(s)][s.dealerval]=2;
+            faction[statetonumber(s)][s.dealerval]='S';
         }
         else
         {
             freward[statetonumber(s)][s.dealerval]=dreward;
-            faction[statetonumber(s)][s.dealerval]=3;
+            faction[statetonumber(s)][s.dealerval]='D';
         }
         // cout<<"freward="<<freward[statetonumber(s)][s.dealerval]<<endl;
     }
@@ -770,7 +804,7 @@ void finalreward(State &s, int deal,float p)
         sreward=standreward(s,deal,p);
         // cout<<"sreward="<<sreward<<endl;
         freward[statetonumber(s)][s.dealerval]=sreward;
-        faction[statetonumber(s)][s.dealerval]=2;
+        faction[statetonumber(s)][s.dealerval]='S';
         // cout<<"freward="<<freward[statetonumber(s)][s.dealerval]<<endl;
     }
     else
@@ -784,12 +818,12 @@ void finalreward(State &s, int deal,float p)
         if(hreward>=sreward)
         {
             freward[statetonumber(s)][s.dealerval]=hreward;
-            faction[statetonumber(s)][s.dealerval]=1;
+            faction[statetonumber(s)][s.dealerval]='H';
         }
         else
         {
             freward[statetonumber(s)][s.dealerval]=sreward;
-            faction[statetonumber(s)][s.dealerval]=2;
+            faction[statetonumber(s)][s.dealerval]='S';
         }
         // cout<<"freward="<<freward[statetonumber(s)][s.dealerval]<<endl;
     }
@@ -835,14 +869,22 @@ void filldp(int deal, float p)
             finalreward(s,deal,p);
         }
     }
-    for(int i=15;i>=1;i--)
+    for(int i=1;i<=15;i++)
     {
-        for(int j=2;j<=11;j++)
+        for(int j=11;j>=2;j--)
         {
             s=numbertostate(i,j);
             finalreward(s,deal,p);
         }
     }
+    // for(int i=24;i<=32;i++)
+    // {
+    //     for(int j=2;j<=11;j++)
+    //     {
+    //         s=numbertostate(i,j);
+    //         finalreward(s,deal,p);
+    //     }
+    // }
     for(int i=33;i>=24;i--)
     {
         for(int j=2;j<=11;j++)
@@ -856,7 +898,7 @@ void filldp(int deal, float p)
 int main()
 {
     float p,freward_temp,e_temp;
-    cout<<"enter p"<<endl;
+    // cout<<"enter p"<<endl;
     cin>>p;float e=100.0; int k=0;
     // while(k<50)
     // {
@@ -870,9 +912,9 @@ int main()
     //             State s=numbertostate(i,j);
     //             finalreward(s,1,p);
     //             if(freward_temp!=0)
-    //             e_temp=fabs(freward[i][j]-freward_temp)*100.0/freward_temp;
     //             else
-    //             e_temp=80;
+    //             e_temp=80;    //             e_temp=fabs(freward[i][j]-freward_temp)*100.0/freward_temp;
+
     //             if(e_temp>e)
     //             e=e_temp;
 
@@ -890,19 +932,38 @@ int main()
     //     k++;
     // }
     filldp(1,p);
+    ofstream outFile;
+    outFile.open("Policy.txt");
     for(int i=1;i<=33;i++)
     {
+        if(i<=15)
+            outFile<<i+4<<"\t";
+        else if(i>15 && i<=23)
+            outFile<<"A"<<i-14<<"\t";
+        else if(i>=24 && i<=32)
+            outFile<<i-22<<i-22<<"\t";
+        else
+            outFile<<"AA\t";        
         for(int j=2;j<=11;j++)
         {
-            cout<<"faction["<<i<<"]["<<j<<"] = "<<faction[i][j]<<" ";
+            outFile<<faction[i][j]<<" ";
         }
-        cout<<endl;
+        outFile<<endl;
     }
-    // cout<<"about AA"<<endl;
+    outFile.close();
+    // for(int i=1;i<=33;i++)
+    // {
+    //     for(int j=2;j<=11;j++)
+    //     {
+    //         cout<<"freward["<<i<<"]["<<j<<"] = "<<freward[i][j]<<" ";
+    //     }
+    //     cout<<endl;
+    // }
+    // cout<<"about 24"<<endl;
     // cout<<"hit"<<endl;
     // for(int j=2;j<=11;j++)
     // {
-    //     State s=numbertostate(10,j);
+    //     State s=numbertostate(24,j);
     //     cout<<hitreward(s,1,p)<<" ";
 
     // }
@@ -910,7 +971,7 @@ int main()
     // cout<<"stand"<<endl;
     // for(int j=2;j<=11;j++)
     // {
-    //     State s=numbertostate(10,j);
+    //     State s=numbertostate(24,j);
     //     cout<<standreward(s,1,p)<<" ";
 
     // }
@@ -918,7 +979,7 @@ int main()
     // cout<<"double"<<endl;
     // for(int j=2;j<=11;j++)
     // {
-    //     State s=numbertostate(10,j);
+    //     State s=numbertostate(24,j);
     //     cout<<doublereward(s,1,p)<<" ";
 
     // }
@@ -926,9 +987,14 @@ int main()
     // cout<<"split"<<endl;
     // for(int j=2;j<=11;j++)
     // {
-    //     State s=numbertostate(10,j);
+    //     State s=numbertostate(24,j);
     //     cout<<splitreward(s,1,p)<<" ";
 
     // }
     // cout<<endl;
+    // for(int i=1;i<=8;i++)
+    // {
+    //     cout<<i<<",2="<<freward[i][2]<<endl;
+    // }
+    // cout<<"16,2="<<freward[16][2]<<endl;
 }
