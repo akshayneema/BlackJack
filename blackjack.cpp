@@ -1,6 +1,8 @@
 #include <iostream>
 #include <cstdlib>
 #include<math.h>
+#include<string>
+#include<stdlib.h>
 using namespace std;
 /*KEY POINTS:
 >> 21 point ke baad bhi chal skte hai unless it is a black jack 21 i.e. len=2
@@ -895,11 +897,19 @@ void filldp(int deal, float p)
     }
 }
 
-int main()
+int main(int argc, char** argv)
 {
     float p,freward_temp,e_temp;
     // cout<<"enter p"<<endl;
-    cin>>p;float e=100.0; int k=0;
+    string fs="";
+    if(argc == 2)
+        fs=argv[1];
+    else 
+        return 0;
+    p=stof(fs);//this is much better way to do it
+    // p=argv[1];
+    // cin>>p;
+    float e=100.0; int k=0;
     // while(k<50)
     // {
     //     e=0;
@@ -932,25 +942,44 @@ int main()
     //     k++;
     // }
     filldp(1,p);
-    ofstream outFile;
-    outFile.open("Policy.txt");
+    // ofstream outFile;
+    // outFile.open("Policy.txt");
     for(int i=1;i<=33;i++)
     {
         if(i<=15)
-            outFile<<i+4<<"\t";
+        {
+            // outFile<<i+4<<"\t";
+            cout<<i+4<<"\t";
+        }
         else if(i>15 && i<=23)
-            outFile<<"A"<<i-14<<"\t";
+        {
+            // outFile<<"A"<<i-14<<"\t";
+            cout<<"A"<<i-14<<"\t";
+        }
         else if(i>=24 && i<=32)
-            outFile<<i-22<<i-22<<"\t";
+        {
+            // outFile<<i-22<<i-22<<"\t";
+            cout<<i-22<<i-22<<"\t";
+        }
         else
-            outFile<<"AA\t";        
+        {
+            // outFile<<"AA\t"; 
+            cout<<"AA\t";
+        }       
         for(int j=2;j<=11;j++)
         {
-            outFile<<faction[i][j]<<" ";
+            // outFile<<faction[i][j]<<" ";
+            cout<<faction[i][j]<<" ";
         }
-        outFile<<endl;
+        // outFile<<endl;
+        cout<<endl;
     }
-    outFile.close();
+    // cout<<"12,2"<<endl;
+    // State s=numbertostate(8,4);
+    // cout<<"hit="<<hitreward(s,1,p)<<endl;
+    // cout<<"stand="<<standreward(s,1,p)<<endl;
+    // cout<<"double="<<doublereward(s,1,p)<<endl;
+    // outFile.close();
     // for(int i=1;i<=33;i++)
     // {
     //     for(int j=2;j<=11;j++)

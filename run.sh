@@ -1,1 +1,1 @@
-./blackjack $1
+./blackjack $1 > Policy.txt

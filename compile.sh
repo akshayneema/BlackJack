@@ -1,1 +1,1 @@
-g++ blackjack.cpp -o blackjack
+g++ -std=c++11 blackjack.cpp -o blackjack
